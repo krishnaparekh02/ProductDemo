@@ -15,8 +15,8 @@ import { Popup } from '../../Helpers';
 import { login } from '../../Redux/Actions';
 
 const Login = ({ navigation }) => {
-    const [email, setEmail] = React.useState('krishna@gmail.com');
-    const [password, setPassword] = React.useState('12345678');
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
     const [emailError, setEmailError] = React.useState('');
     const [passwordError, setPasswordError] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(false);
