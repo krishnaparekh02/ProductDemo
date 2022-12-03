@@ -11,6 +11,7 @@ import { MainStyles, Images, Icons, Matrics, Colors, Fonts } from './CommonConfi
 import Login from './screens/Auth/Login';
 import ProductList from './screens/Product/ProductList';
 import AddProduct from './screens/Product/AddProduct';
+import EditProduct from './screens/Product/EditProduct';
 
 // --------------- ROUTES ---------------
 const Routes = () => {
@@ -32,6 +33,11 @@ const Routes = () => {
                 <Stack.Screen
                     name='AddProduct'
                     component={AddProduct}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name='EditProduct'
+                    component={EditProduct}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>

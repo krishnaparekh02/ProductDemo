@@ -27,7 +27,7 @@ export default (state = INITIAL_STATE, action) => {
                 successMsg: 'User Login successfully',
                 data: {
                     ...state.data,
-                    newsData: action.payload,
+                    userData: action.payload,
                 },
             };
         case Login.FAILED:

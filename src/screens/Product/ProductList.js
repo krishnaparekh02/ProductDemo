@@ -27,10 +27,8 @@ const ProductList = ({ navigation }) => {
     
     //----------METHOD---------------
     const getProducts = async () => {
-        console.log('getProducts', global.userId);
         await firestore().collection('Products').where('userId', '==', global.userId).get()
         .then(async (data) => {
-            console.log('productdata-->', data);
             let productsData = [];
             data.forEach((product) => {
                 let tempObj = {
@@ -39,12 +37,10 @@ const ProductList = ({ navigation }) => {
                 }
                 productsData.push(tempObj)
             });
-            console.log('productdata--data-->', productsData);
             setIsLoading(false);
             setProductData(productsData);
         })
         .catch(error => {
-            console.log("error", error);
             Popup.error(error.message);
             setIsLoading(false);
         });
@@ -73,9 +69,9 @@ const ProductList = ({ navigation }) => {
             .delete()
             .then(() => {
                 Popup.success('Product Deleted Successfully!');
+                getProducts();
             })
             .catch(error => {
-                console.log("error", error);
                 Popup.error(error.message);
                 setIsLoading(false);
         });;
@@ -102,7 +98,7 @@ const ProductList = ({ navigation }) => {
                     >
                         <Text style={styles.delText}>Delete</Text>
                     </Pressable>
-                    <View style={styles.itemInnerContainer}>
+                    <Pressable style={styles.itemInnerContainer} onPress={() => navigation.navigate('EditProduct',{selectedItem: item})}>
                         <View style={{ flexDirection: 'row' }}>
                             <Image
                                 source={Images.IC_PlaceHolder}
@@ -118,7 +114,7 @@ const ProductList = ({ navigation }) => {
                             <Text style={styles.priceTextLabel}>Offer Price: </Text>
                             <Text style={styles.priceText}>₹ {parseInt(item?.product_data?.offerPrice).toFixed(2)}</Text>
                         </View>
-                    </View>
+                    </Pressable>
                 </SwipeRow>
             )
         }

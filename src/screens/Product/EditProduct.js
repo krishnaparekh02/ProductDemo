@@ -4,7 +4,6 @@ import { View, Text, Pressable, TouchableOpacity, Image, Modal, SafeAreaView } f
 import { useSelector, useDispatch } from 'react-redux';
 import ImagePicker from 'react-native-image-crop-picker';
 import firestore from '@react-native-firebase/firestore';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 // --------------- ASSETS ---------------
 import { Colors, Fonts, MainStyles, Images, Icons, Matrics, Constants } from '../../CommonConfig';
@@ -12,10 +11,12 @@ import { AddProductStyle as styles } from './Styles';
 import { Input, Loader } from '../../Components/Common';
 import { Popup } from '../../Helpers';
 
-const AddProduct = ({ navigation }) => {
-    const [name, setName] = React.useState('');
-    const [price, setPrice] = React.useState('');
-    const [offerPrice, setofferPrice] = React.useState('');
+const EditProduct = ({ navigation, route }) => {
+    const { selectedItem } = route.params;
+
+    const [name, setName] = React.useState(selectedItem?.product_data?.name ?? '');
+    const [price, setPrice] = React.useState(selectedItem?.product_data?.price ?? '');
+    const [offerPrice, setofferPrice] = React.useState(selectedItem?.product_data?.offerPrice ?? '');
     const [productImage, setProductImage] = React.useState('');
     const [ImageName, setImageName] = React.useState('');
     const [ImageType, setImageType] = React.useState('');
@@ -69,7 +70,7 @@ const AddProduct = ({ navigation }) => {
         });
     }
 
-    const onPressAddProduct = () => {
+    const onPressEditProduct = () => {
         if (name == "") {
             setNameError('Please enter name');
         } else if (price == "") {
@@ -92,10 +93,11 @@ const AddProduct = ({ navigation }) => {
         }
         await firestore()
             .collection("Products")
-            .add(productObj)
+            .doc(selectedItem?.pid)
+            .update(productObj)
             .then(async () => {
                 setIsLoading(false);
-                Popup.success('Product created successfully!');
+                Popup.success('Product updated successfully!');
                 navigation.goBack();
             })
             .catch(error => {
@@ -110,12 +112,9 @@ const AddProduct = ({ navigation }) => {
                 <Pressable onPress={() => navigation.goBack()} style={styles.headerImg}>
                     <Image source={Icons.IC_BACK_BUTTON}  />
                 </Pressable>
-                <Text style={styles.headerText}>Create Product</Text>
+                <Text style={styles.headerText}>Edit Product</Text>
             </SafeAreaView>
-            <KeyboardAwareScrollView
-                    bounces={false}
-                    contentContainerStyle={styles.InnerContainer}
-                >
+            <View style={styles.InnerContainer}>
                 <Text style={styles.LabelText}>Product Image</Text>
                 <Pressable style={styles.buttonImage} onPress={() => setModalVisible(true)} >
                     <Image source={productImage ? {uri: productImage} : Images.IC_PlaceHolder} style={styles.BtnImg}/>
@@ -154,10 +153,10 @@ const AddProduct = ({ navigation }) => {
                     errorMsg={offerPriceError}
                     inputStyle={{ color: Colors.BLACK}}
                 />
-                <Pressable  onPress={() => onPressAddProduct()} style={styles.btnContainer}>
-                    <Text style={styles.label}>Create Product</Text>
+                <Pressable  onPress={() => onPressEditProduct()} style={styles.btnContainer}>
+                    <Text style={styles.label}>Update Product</Text>
                 </Pressable>
-            </KeyboardAwareScrollView>
+            </View>
             <Loader visible={isLoading} />
             <Modal
                 visible={modalVisible}
@@ -184,4 +183,4 @@ const AddProduct = ({ navigation }) => {
     )
 }
 
-export default AddProduct;
+export default EditProduct;
