@@ -1,5 +1,5 @@
 // --------------- TYPES ---------------
-import { Login, Register, GetProducts, CreateProducts, DeleteProducts } from '../Types';
+import { Login, Register, GetProducts, CreateProducts, DeleteProducts, UpdateProducts } from '../Types';
 
 // --------------- ACTIONS ---------------
 export const login = {
@@ -72,6 +72,21 @@ export const deleteProduct = {
     }),
     Failed: (error) => ({
         type: DeleteProducts.FAILED,
+        payload: error,
+    }),
+};
+
+export const editProduct = {
+    Request: (params) => ({
+        type: UpdateProducts.REQUEST,
+        params,
+    }),
+    Success: (data) => ({
+        type: UpdateProducts.SUCCESS,
+        payload: data,
+    }),
+    Failed: (error) => ({
+        type: UpdateProducts.FAILED,
         payload: error,
     }),
 };

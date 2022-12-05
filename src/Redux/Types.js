@@ -26,6 +26,12 @@ export const CreateProducts = {
     FAILED: 'create_products_failed',
 };
 
+export const UpdateProducts = {
+    REQUEST: 'update_products_request',
+    SUCCESS: 'update_products_success',
+    FAILED: 'update_products_failed',
+};
+
 export const DeleteProducts = {
     REQUEST: 'delete_products_request',
     SUCCESS: 'delete_products_success',

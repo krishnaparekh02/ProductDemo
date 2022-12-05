@@ -11,6 +11,7 @@ import { Colors, Fonts, MainStyles, Images, Icons, Matrics, Constants } from '..
 import { AddProductStyle as styles } from './Styles';
 import { Input, Loader } from '../../Components/Common';
 import { Popup } from '../../Helpers';
+import { addProducts } from '../../Redux/Actions';
 
 const AddProduct = ({ navigation }) => {
     const [name, setName] = React.useState('');
@@ -25,7 +26,23 @@ const AddProduct = ({ navigation }) => {
     const [offerPriceError, setOfferPriceError] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(false);
 
+    // --------------- REDUCER STATE ---------------
+    const { Products } = useSelector((state) => state);
+    const dispatch = useDispatch();
+
     //----------LIFECYCLE/ HOOKS---------------
+    React.useEffect(() => {
+        if (isLoading && Products.isCreateProductSuccess == true) {
+            setIsLoading(false);
+            Popup.success(Products.successMsg);
+            setTimeout(() => {
+                navigation.goBack();
+            },1000);
+        } else if (isLoading && Products.isCreateProductSuccess == false) {
+            setIsLoading(false);
+            Popup.error(Products.errorMsg);
+        }
+    },[Products.isCreateProductSuccess]);
 
     //----------METHOD---------------
     const onPressTakePhoto = () => {
@@ -77,8 +94,16 @@ const AddProduct = ({ navigation }) => {
         } else if (offerPrice == "") {
             setOfferPriceError('Please enter offer price');
         } else {
+            const params = {
+                "userId": global.userId,
+                "name": name,
+                "price": price,
+                "offerPrice": offerPrice,
+                "image": ImageName
+            }
             setIsLoading(true);
-            fireStoreProduct();
+            dispatch(addProducts.Request(params));
+            // fireStoreProduct();
         }
     }
 

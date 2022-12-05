@@ -1,5 +1,5 @@
 // --------------- TYPES ---------------
-import { Login, Register, GetProducts, CreateProducts, DeleteProducts } from '../Types';
+import { Login, Register, GetProducts, CreateProducts, DeleteProducts, UpdateProducts } from '../Types';
 
 // --------------- INITIAL STATE ---------------
 export const INITIAL_STATE = {
@@ -108,6 +108,54 @@ export default (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 isProductDeletedSuccess: false,
+                error: action.payload,
+                errorMsg: action.payload.message,
+            };
+        case CreateProducts.REQUEST:
+            return {
+                ...state,
+                isCreateProductSuccess: null,
+                error: null,
+                errorMsg: '',
+                successMsg: ''
+            };
+        case CreateProducts.SUCCESS:
+            return {
+                ...state,
+                isCreateProductSuccess: true,
+                successMsg: 'Product Created Successfully!',
+                data: {
+                    ...state.data,
+                },
+            };
+        case CreateProducts.FAILED:
+            return {
+                ...state,
+                isCreateProductSuccess: false,
+                error: action.payload,
+                errorMsg: action.payload.message,
+            };
+        case UpdateProducts.REQUEST:
+            return {
+                ...state,
+                isProductUpdatedSuccess: null,
+                error: null,
+                errorMsg: '',
+                successMsg: ''
+            };
+        case UpdateProducts.SUCCESS:
+            return {
+                ...state,
+                isProductUpdatedSuccess: true,
+                successMsg: 'Product Updated Successfully!',
+                data: {
+                    ...state.data,
+                },
+            };
+        case UpdateProducts.FAILED:
+            return {
+                ...state,
+                isProductUpdatedSuccess: false,
                 error: action.payload,
                 errorMsg: action.payload.message,
             };

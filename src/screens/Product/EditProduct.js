@@ -10,6 +10,7 @@ import { Colors, Fonts, MainStyles, Images, Icons, Matrics, Constants } from '..
 import { AddProductStyle as styles } from './Styles';
 import { Input, Loader } from '../../Components/Common';
 import { Popup } from '../../Helpers';
+import { editProduct } from '../../Redux/Actions';
 
 const EditProduct = ({ navigation, route }) => {
     const { selectedItem } = route.params;
@@ -26,8 +27,22 @@ const EditProduct = ({ navigation, route }) => {
     const [offerPriceError, setOfferPriceError] = React.useState('');
     const [isLoading, setIsLoading] = React.useState(false);
 
+    // --------------- REDUCER STATE ---------------
+    const { Products } = useSelector((state) => state);
+    const dispatch = useDispatch();
     //----------LIFECYCLE/ HOOKS---------------
-
+    React.useEffect(() => {
+        if (isLoading && Products.isProductUpdatedSuccess == true) {
+            setIsLoading(false);
+            Popup.success(Products.successMsg);
+            setTimeout(() => {
+                navigation.goBack();
+            },1000);
+        } else if (isLoading && Products.isProductUpdatedSuccess == false) {
+            setIsLoading(false);
+            Popup.error(Products.errorMsg);
+        }
+    },[Products.isProductUpdatedSuccess]);
     //----------METHOD---------------
     const onPressTakePhoto = () => {
         ImagePicker.openCamera({
@@ -78,8 +93,17 @@ const EditProduct = ({ navigation, route }) => {
         } else if (offerPrice == "") {
             setOfferPriceError('Please enter offer price');
         } else {
+            const params = {
+                "pid": selectedItem?.pid,
+                "userId": global.userId,
+                "name": name,
+                "price": price,
+                "offerPrice": offerPrice,
+                "image": ImageName
+            }
             setIsLoading(true);
-            fireStoreProduct();
+            dispatch(editProduct.Request(params));
+            // fireStoreProduct();
         }
     }
 
