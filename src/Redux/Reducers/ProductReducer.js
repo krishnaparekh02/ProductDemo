@@ -62,6 +62,55 @@ export default (state = INITIAL_STATE, action) => {
                 error: action.payload,
                 errorMsg: action.payload.message,
             };
+        case GetProducts.REQUEST:
+            return {
+                ...state,
+                isProductsSuccess: null,
+                error: null,
+                errorMsg: '',
+                successMsg: ''
+            };
+        case GetProducts.SUCCESS:
+            return {
+                ...state,
+                isProductsSuccess: true,
+                successMsg: 'Products returns successfully!',
+                data: {
+                    ...state.data,
+                    productData: action.payload,
+                },
+            };
+        case GetProducts.FAILED:
+            return {
+                ...state,
+                isProductsSuccess: false,
+                error: action.payload,
+                errorMsg: action.payload.message,
+            };
+        case DeleteProducts.REQUEST:
+            return {
+                ...state,
+                isProductDeletedSuccess: null,
+                error: null,
+                errorMsg: '',
+                successMsg: ''
+            };
+        case DeleteProducts.SUCCESS:
+            return {
+                ...state,
+                isProductDeletedSuccess: true,
+                successMsg: 'Product Deleted Successfully!',
+                data: {
+                    ...state.data,
+                },
+            };
+        case DeleteProducts.FAILED:
+            return {
+                ...state,
+                isProductDeletedSuccess: false,
+                error: action.payload,
+                errorMsg: action.payload.message,
+            };
         default:
             return state;
     }

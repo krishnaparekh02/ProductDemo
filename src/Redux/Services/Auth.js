@@ -38,7 +38,7 @@ export default {
         .catch(error => {
             return {
                 status: false,
-                data: error,
+                data: error.message,
             }
         });
     }

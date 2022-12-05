@@ -8,42 +8,73 @@ import { useFocusEffect } from '@react-navigation/native';
 // --------------- ASSETS ---------------
 import { Colors, Fonts, MainStyles, Images, Icons, Matrics } from '../../CommonConfig';
 import { ProductListStyle as styles } from './Styles';
-import { Input, NoData } from '../../Components/Common';
+import { Input, NoData,Loader } from '../../Components/Common';
 import { Popup } from '../../Helpers';
 import firestore from '@react-native-firebase/firestore';
+import { getProducts, deleteProduct } from '../../Redux/Actions';
 
 const ProductList = ({ navigation }) => {
     const [productData, setProductData] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(false);
+    const [deleteLoader, setDeleteLoader] = React.useState(false);
+
+     // --------------- REDUCER STATE ---------------
+     const { Products } = useSelector((state) => state);
+     const dispatch = useDispatch();
 
     //----------LIFECYCLE/ HOOKS---------------
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-          getProducts();
+          getProductsData();
         });
 
         return unsubscribe;
     }, [navigation]);
+
+    React.useEffect(() => {
+        if (isLoading && Products.isProductsSuccess == true) {
+            setIsLoading(false);
+            Popup.success(Products.successMsg);
+            console.log('productdata', Products?.data?.productData);
+            setProductData(Products?.data?.productData?.data);
+        } else if (isLoading && Products.isProductsSuccess == false) {
+            setIsLoading(false);
+            Popup.error(Products.errorMsg);
+        }
+    },[Products.isProductsSuccess]);
+
+    React.useEffect(() => {
+        if (isLoading && Products.isProductDeletedSuccess == true) {
+            setDeleteLoader(false);
+            Popup.success(Products.successMsg);
+            getProductsData();
+        } else if (isLoading && Products.isProductDeletedSuccess == false) {
+            setDeleteLoader(false);
+            Popup.error(Products.errorMsg);
+        }
+    },[Products.isProductDeletedSuccess]);
     
     //----------METHOD---------------
-    const getProducts = async () => {
-        await firestore().collection('Products').where('userId', '==', global.userId).get()
-        .then(async (data) => {
-            let productsData = [];
-            data.forEach((product) => {
-                let tempObj = {
-                    'product_data': product.data(),
-                    'pid': product.id
-                }
-                productsData.push(tempObj)
-            });
-            setIsLoading(false);
-            setProductData(productsData);
-        })
-        .catch(error => {
-            Popup.error(error.message);
-            setIsLoading(false);
-        });
+    const getProductsData = async () => {
+        setIsLoading(true);
+        dispatch(getProducts.Request());
+        // await firestore().collection('Products').where('userId', '==', global.userId).get()
+        // .then(async (data) => {
+        //     let productsData = [];
+        //     data.forEach((product) => {
+        //         let tempObj = {
+        //             'product_data': product.data(),
+        //             'pid': product.id
+        //         }
+        //         productsData.push(tempObj)
+        //     });
+        //     setIsLoading(false);
+        //     setProductData(productsData);
+        // })
+        // .catch(error => {
+        //     Popup.error(error.message);
+        //     setIsLoading(false);
+        // });
     }
     
     const deleteRow = (item) => {
@@ -62,19 +93,20 @@ const ProductList = ({ navigation }) => {
     }
 
     const removeProduct = async (Item) => {
-        console.log('Id-->', Item);
-        await firestore()
-            .collection('Products')
-            .doc(Item?.pid)
-            .delete()
-            .then(() => {
-                Popup.success('Product Deleted Successfully!');
-                getProducts();
-            })
-            .catch(error => {
-                Popup.error(error.message);
-                setIsLoading(false);
-        });;
+        setIsLoading(true);
+        dispatch(deleteProduct.Request({Id: Item?.pid}));
+        // await firestore()
+        //     .collection('Products')
+        //     .doc(Item?.pid)
+        //     .delete()
+        //     .then(() => {
+        //         Popup.success('Product Deleted Successfully!');
+        //         getProducts();
+        //     })
+        //     .catch(error => {
+        //         Popup.error(error.message);
+        //         setIsLoading(false);
+        // });;
     }
     // --------------- UI METHODS ---------------
     const renderItem = React.useCallback(
@@ -148,6 +180,7 @@ const ProductList = ({ navigation }) => {
                 // }
                 />
             </View>
+            <Loader visible={isLoading || deleteLoader} />
         </View>
     )
 }

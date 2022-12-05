@@ -33,9 +33,8 @@ export const signup = {
 };
 
 export const getProducts = {
-    Request: (params) => ({
+    Request: () => ({
         type: GetProducts.REQUEST,
-        params,
     }),
     Success: (data) => ({
         type: GetProducts.SUCCESS,
