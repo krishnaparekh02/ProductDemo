@@ -1,13 +1,12 @@
 // --------------- LIBRARIES ---------------
 import { put, call, takeEvery, all, select } from 'redux-saga/effects';
 // --------------- TYPES ---------------
-import { Login, GetProducts, CreateProducts, DeleteProducts } from '../Types';
-import { login, getProducts, addProducts, deleteProduct} from '../Actions';
+import { Login, Register, GetProducts, CreateProducts, DeleteProducts } from '../Types';
+import { login, signup, getProducts, addProducts, deleteProduct} from '../Actions';
 
 import API from '../Services/Auth';
 
 const loginSaga = function* loginSaga({ params }) {
-    console.log('sagaparams-->', params)
     try {
         const response = yield call(API.Login, params);
         console.log('res-->', response)
@@ -20,9 +19,23 @@ const loginSaga = function* loginSaga({ params }) {
     }
 };
 
+const registerSaga = function* registerSaga({ params }) {
+    try {
+        const response = yield call(API.register, params);
+        console.log('signupres-->', response)
+        if (response?.status != true) {
+            throw new Error(response?.message ?? '');
+        }
+        yield put(signup.Success(response));
+    } catch (error) {
+        yield put(signup.Failed(error));
+    }
+};
+
 function* productSaga() {
     yield all([
         takeEvery(Login.REQUEST, loginSaga),
+        takeEvery(Register.REQUEST, registerSaga),
     ]);
 }
 

@@ -12,7 +12,7 @@ import { Colors, Fonts, MainStyles, Images, Icons, Matrics } from '../../CommonC
 import { LoginStyle as styles } from './Styles';
 import { Input, Loader } from '../../Components/Common';
 import { Popup } from '../../Helpers';
-import { login } from '../../Redux/Actions';
+import { login, signup } from '../../Redux/Actions';
 
 const Login = ({ navigation }) => {
     const [email, setEmail] = React.useState('');
@@ -26,16 +26,36 @@ const Login = ({ navigation }) => {
     const dispatch = useDispatch();
 
     //----------LIFECYCLE/ HOOKS---------------
-    // React.useEffect(() => {
-    //     if (isLoading && Products.isLoginSuccess == true) {
-    //         setIsLoading(false);
-    //         Popup.success(Products.successMsg);
-    //         // console.log('userdata', Products?.data?.userData?.user?.uid);
-    //     } else if (isLoading && Products.isLoginSuccess == false) {
-    //         setIsLoading(false);
-    //         Popup.error(Products.errorMsg);
-    //     }
-    // }, [Products.isLoginSuccess]);
+    React.useEffect(() => {
+        if (isLoading && Products.isLoginSuccess == true) {
+            setIsLoading(false);
+            Popup.success(Products.successMsg);
+            console.log('userdata', Products?.data?.userData?.data?.user?.uid);
+            storeUserIdInStorage(Products?.data?.userData?.data?.user?.uid);
+        } else if (isLoading && Products.isLoginSuccess == false) {
+            if(Products.errorMsg == '[auth/user-not-found] There is no user record corresponding to this identifier. The user may have been deleted.')
+            {
+                FirebaseSignUp();
+            } else {
+                setIsLoading(false);
+                Popup.error(Products.errorMsg);
+            }
+        }
+    }, [Products.isLoginSuccess]);
+
+    //register
+    React.useEffect(() => {
+        if (isLoading && Products.isRegisterSuccess == true) {
+            setIsLoading(false);
+            Popup.success(Products.successMsg);
+            console.log('registeruserdata', Products?.data?.userData?.data?.user?.uid);
+            storeUserIdInStorage(Products?.data?.userData?.data?.user?.uid);
+        } else if (isLoading && Products.isRegisterSuccess == false) {
+            setIsLoading(false);
+            Popup.error(Products.errorMsg);
+        }
+    },[Products.isRegisterSuccess]);
+
     React.useEffect(() => {
         checkUserLogin();
     },[]);
@@ -50,6 +70,13 @@ const Login = ({ navigation }) => {
             }
         });
     }
+    
+    const storeUserIdInStorage = async (userId) => {
+        await AsyncStorage.setItem('userid', JSON.stringify(userId));
+        global.userId = userId;
+        navigateToRoot();
+    }
+
     const onPressSignIn = () => {
         let reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (email == "") {
@@ -62,42 +89,47 @@ const Login = ({ navigation }) => {
             setPasswordError('Your password must be at least 8 characters long');
         } else {
             setIsLoading(true);
-            firebaseLogin();
+            dispatch(login.Request({
+                "email": email,
+                "password": password
+            }));
+            // firebaseLogin();
         }
     }
 
     const FirebaseSignUp = () => {
-        auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then(async (res) => {
-            setIsLoading(false);
-            console.log('User account created & signed in!-->', res);
-            Popup.success('User logged in successfully!');
-            await AsyncStorage.setItem('userid', JSON.stringify(res?.user?.uid));
-            global.userId = res?.user?.uid;
-            navigateToRoot();
-        })
-        .catch(error => {
-            setIsLoading(false);
-            if (error.code === 'auth/email-already-in-use') {
-                console.log('That email address is already in use!');
-                Popup.error('That email address is already in use!')
-            }
+        console.log('firebasesignup')
+        dispatch(signup.Request({
+            "email": email,
+            "password": password
+        }));
+        // auth()
+        // .createUserWithEmailAndPassword(email, password)
+        // .then(async (res) => {
+        //     setIsLoading(false);
+        //     console.log('User account created & signed in!-->', res);
+        //     Popup.success('User logged in successfully!');
+        //     await AsyncStorage.setItem('userid', JSON.stringify(res?.user?.uid));
+        //     global.userId = res?.user?.uid;
+        //     navigateToRoot();
+        // })
+        // .catch(error => {
+        //     setIsLoading(false);
+        //     if (error.code === 'auth/email-already-in-use') {
+        //         console.log('That email address is already in use!');
+        //         Popup.error('That email address is already in use!')
+        //     }
 
-            if (error.code === 'auth/invalid-email') {
-                console.log('That email address is invalid!');
-                Popup.error('That email address is invalid!')
-            }
-            console.error('error signup-->',error);
-            Popup.error(error.message);
-        });
+        //     if (error.code === 'auth/invalid-email') {
+        //         console.log('That email address is invalid!');
+        //         Popup.error('That email address is invalid!')
+        //     }
+        //     console.error('error signup-->',error);
+        //     Popup.error(error.message);
+        // });
     }
 
     const firebaseLogin = () => {
-        // dispatch(login.Request({
-        //     "email": email,
-        //     "password": password
-        // }));
         auth()
         .signInWithEmailAndPassword(email, password)
         .then(async(res) => {

@@ -2,7 +2,6 @@ import auth from '@react-native-firebase/auth';
 
 export default {
     Login: (params) => {
-        console.log('params-->', params);
         const Email = params?.email;
         const Password = params?.password;
         return auth()
@@ -20,16 +19,27 @@ export default {
             console.error('msg-->',  error.message);
             return {
                 status: false,
-                data: error,
+                message:  error.message,
             }
-            // if(error.message == '[auth/user-not-found] There is no user record corresponding to this identifier. The user may have been deleted.')
-            // {
-            //     // FirebaseSignUp();
-            // } else {
-            //     // setIsLoading(false);
-            //     console.log('else')
-            //     Popup.error(error.message);
-            // }
         });
     },
+    register: (params) => {
+        const Email = params?.email;
+        const Password = params?.password;
+        return auth()
+        .createUserWithEmailAndPassword(Email, Password)
+        .then(async (res) => {
+            console.log('User account created & signed in!-->', res);
+            return {
+                status: true,
+                data: res,
+            }
+        })
+        .catch(error => {
+            return {
+                status: false,
+                data: error,
+            }
+        });
+    }
 }

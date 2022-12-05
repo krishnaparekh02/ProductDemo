@@ -8,6 +8,12 @@
     FAILED: 'login_failed',
 };
 
+export const Register = {
+    REQUEST: 'register_request',
+    SUCCESS: 'register_success',
+    FAILED: 'register_failed',
+};
+
 export const GetProducts = {
     REQUEST: 'get_products_request',
     SUCCESS: 'get_products_success',
